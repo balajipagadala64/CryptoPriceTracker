@@ -1,18 +1,25 @@
 package balaji.project.cryptopricetracker
 
+
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,15 +29,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import balaji.project.cryptopricetracker.ui.theme.CryptoPriceTrackerTheme
 import kotlinx.coroutines.delay
+import kotlin.jvm.java
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,11 +69,11 @@ fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
 
     LaunchedEffect(Unit) {
         delay(3000)
-//        splashValue = false
+        splashValue = false
     }
 
     if (splashValue) {
-        LoadingScreen()
+        CryptoPriceScreen()
     } else {
         isUserLoggedIn.invoke(2)
     }
@@ -72,52 +81,92 @@ fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
 
 
 @Composable
-fun LoadingScreen() {
-    Box(
+fun CryptoPriceScreen() {
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = colorResource(id = R.color.purple_500)),
-        contentAlignment = Alignment.Center
+            .background(
+                color = colorResource(id = R.color.first_color),
+            ),
     ) {
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Image(
+            painter = painterResource(id = R.drawable.icon_cryptocurrency), // Replace with your actual SVG drawable
+            contentDescription = null,
+            contentScale = ContentScale.FillWidth,
+            modifier = Modifier
+                .width(300.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .offset(y = (-20).dp)
+                .background(
+                    color = colorResource(id = R.color.first_color),
+                    shape = RoundedCornerShape(
+                        topStart = 40.dp,
+                        topEnd = 40.dp,
+                        bottomStart = 0.dp,
+                        bottomEnd = 0.dp
+                    )
+                )
+                .border(
+                    width = 2.dp,
+                    color = colorResource(id = R.color.first_color),
+                    shape = RoundedCornerShape(
+                        topStart = 40.dp,
+                        topEnd = 40.dp,
+                        bottomStart = 0.dp,
+                        bottomEnd = 0.dp
+                    )
+
+                )
         ) {
 
             Spacer(modifier = Modifier.weight(1f))
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "Crypto Price Tracking App",
+                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            )
 
-
-            Image(
-                painter = painterResource(id = R.drawable.icon_cryptocurrency),
-                contentDescription = "Crypto Currency App",
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "A Project By",
+                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             )
 
             Text(
-                text = "Crypto Currency App",
-                color = colorResource(id = R.color.black),
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(bottom = 6.dp)
-                    .align(Alignment.CenterHorizontally)
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = "Balagi  Pagadala",
+                color = Color.White,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
             )
 
             Spacer(modifier = Modifier.weight(1f))
 
 
         }
-    }
 
+    }
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun LoadingScreenPreview() {
-    LoadingScreen()
+    CryptoPriceScreen()
 }
 
 fun gotoSignInActivity(context: Activity) {
-//    context.startActivity(Intent(context, SignInActivity::class.java))
-//    context.finish()
+    context.startActivity(Intent(context, LoginActivity::class.java))
+    context.finish()
 }

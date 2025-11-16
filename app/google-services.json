@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "999469676262",
+    "project_id": "cryptopricetracker-d551c",
+    "storage_bucket": "cryptopricetracker-d551c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999469676262:android:6f62b1a513b399ee4d6d27",
+        "android_client_info": {
+          "package_name": "balaji.project.cryptopricetracker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcV4OUguyDK4oKfVqON5KN2ubxk8yAQ80"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

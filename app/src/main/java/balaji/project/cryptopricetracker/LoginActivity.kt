@@ -1,5 +1,6 @@
 package balaji.project.cryptopricetracker
 
+import android.R.attr.password
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.google.firebase.database.FirebaseDatabase
 import kotlin.jvm.java
 
 class LoginActivity : ComponentActivity() {
@@ -105,7 +107,7 @@ fun InvestorSignInScreen() {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = "Taxi Booking App",
+                text = "Crypto Price Tracker",
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
             )
 
@@ -156,6 +158,30 @@ fun InvestorSignInScreen() {
                             }
                             else -> {
 
+                                val database = FirebaseDatabase.getInstance()
+                                val databaseReference = database.reference
+
+                                val sanitizedEmail = accountEmail.replace(".", ",")
+
+                                databaseReference.child("InsertorAccounts").child(sanitizedEmail).get()
+                                    .addOnSuccessListener { snapshot ->
+                                        if (snapshot.exists()) {
+                                            val chefData = snapshot.getValue(InvestorData::class.java)
+                                            chefData?.let {
+
+                                                if (accountPassword == it.password) {
+                                                    Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
+                                                }
+                                                else{
+                                                    Toast.makeText(context,"Incorrect Credentials",Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
+                                        } else {
+                                            Toast.makeText(context,"No User Found",Toast.LENGTH_SHORT).show()
+                                        }
+                                    }.addOnFailureListener { exception ->
+                                        println("Error retrieving data: ${exception.message}")
+                                    }
 
                             }
                         }
@@ -190,6 +216,22 @@ fun InvestorSignInScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
+                        context.startActivity(Intent(context, ResetPasswordActivity::class.java))
+                    },
+                text = "Reset My Password",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = colorResource(id = R.color.second_color),
+                )
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp)
+                    .clickable {
                         context.startActivity(Intent(context, RegisterActivity::class.java))
                         context.finish()
                     },
@@ -205,3 +247,13 @@ fun InvestorSignInScreen() {
 
     }
 }
+
+
+data class InvestorData
+    (
+    var name: String = "",
+    var dob: String ="",
+    var gender: String ="",
+    var email: String ="",
+    var password: String ="",
+)

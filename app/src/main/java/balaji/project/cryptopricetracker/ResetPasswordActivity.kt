@@ -34,6 +34,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.database.FirebaseDatabase
 
@@ -44,6 +45,12 @@ class ResetPasswordActivity : ComponentActivity() {
             ResetPasswordScreen()
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ResetPasswordScreenPreview() {
+    ResetPasswordScreen()
 }
 
 @Composable
@@ -61,10 +68,9 @@ fun ResetPasswordScreen() {
     var errorMessage by remember { mutableStateOf("") }
     var successMessage by remember { mutableStateOf("") }
 
-    val context = LocalContext.current as Activity
+    val context = LocalContext.current.findActivity()
 
 
-    val dbRef = FirebaseDatabase.getInstance().getReference("SignedUpUsers")
 
     Column(
         modifier = Modifier
@@ -160,7 +166,7 @@ fun ResetPasswordScreen() {
 
                             val key = email.replace(".", ",")
 
-                            dbRef.child(key).get()
+                            FirebaseDatabase.getInstance().getReference("SignedUpUsers").child(key).get()
                                 .addOnSuccessListener { snapshot ->
                                     loading = false
 
@@ -254,12 +260,12 @@ fun ResetPasswordScreen() {
 
                             val key = email.replace(".", ",")
 
-                            dbRef.child(key).child("password").setValue(newPassword)
+                            FirebaseDatabase.getInstance().getReference("SignedUpUsers").child(key).child("password").setValue(newPassword)
                                 .addOnSuccessListener {
                                     loading = false
                                     successMessage = "Password updated successfully!"
 
-                                    context.startActivity(
+                                    context!!.startActivity(
                                         Intent(
                                             context,
                                             LoginActivity::class.java

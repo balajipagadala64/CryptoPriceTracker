@@ -1,12 +1,11 @@
 package balaji.project.cryptopricetracker
 
 
-import android.R.attr.password
-import android.R.attr.text
 import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log.e
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,13 +41,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.database.FirebaseDatabase
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
-import kotlin.jvm.java
 
 
 class RegisterActivity : ComponentActivity() {
@@ -58,6 +57,12 @@ class RegisterActivity : ComponentActivity() {
             InvestorSignUpScreen()
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InvestorSignUpScreenPreview() {
+    InvestorSignUpScreen()
 }
 
 
@@ -72,7 +77,7 @@ fun InvestorSignUpScreen() {
 
     var selectedGender by remember { mutableStateOf("Male") }
 
-    val context = LocalContext.current as Activity
+    val context = LocalContext.current.findActivity()
 
 
     Column(
@@ -297,7 +302,7 @@ fun InvestorSignUpScreen() {
                                 if (task.isSuccessful) {
                                     Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
 
-                                    context.startActivity(
+                                    context!!.startActivity(
                                         Intent(
                                             context,
                                             LoginActivity::class.java
@@ -353,7 +358,7 @@ fun InvestorSignUpScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
-                        context.startActivity(Intent(context, LoginActivity::class.java))
+                        context!!.startActivity(Intent(context, LoginActivity::class.java))
                         context.finish()
                     },
                 text = "Take Me To Login",
@@ -367,4 +372,10 @@ fun InvestorSignUpScreen() {
         }
 
     }
+}
+
+fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }

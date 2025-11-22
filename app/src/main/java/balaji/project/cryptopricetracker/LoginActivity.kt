@@ -1,7 +1,5 @@
 package balaji.project.cryptopricetracker
 
-import android.R.attr.password
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -36,9 +34,9 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.database.FirebaseDatabase
-import kotlin.jvm.java
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +47,11 @@ class LoginActivity : ComponentActivity() {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun InvestorSignInScreenPreview() {
+    InvestorSignInScreen()
+}
 
 @Composable
 fun InvestorSignInScreen() {
@@ -56,7 +59,7 @@ fun InvestorSignInScreen() {
     var accountEmail by remember { mutableStateOf("") }
     var accountPassword by remember { mutableStateOf("") }
 
-    val context = LocalContext.current as Activity
+    val context = LocalContext.current.findActivity()
 
 
     Column(
@@ -216,7 +219,7 @@ fun InvestorSignInScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
-                        context.startActivity(Intent(context, ResetPasswordActivity::class.java))
+                        context!!.startActivity(Intent(context, ResetPasswordActivity::class.java))
                     },
                 text = "Reset My Password",
                 textAlign = TextAlign.Center,
@@ -232,7 +235,7 @@ fun InvestorSignInScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
-                        context.startActivity(Intent(context, RegisterActivity::class.java))
+                        context!!.startActivity(Intent(context, RegisterActivity::class.java))
                         context.finish()
                     },
                 text = "Take Me To Registration",

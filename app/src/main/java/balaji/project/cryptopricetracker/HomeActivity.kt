@@ -13,16 +13,18 @@ class HomeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
 
-            val sampleAssets = listOf(
-                CryptoAsset("btc", "Bitcoin", "BTC", 68500.50, 2.34, Color(0xFFF7931A)),
-                CryptoAsset("eth", "Ethereum", "ETH", 3950.25, -1.12, Color(0xFF627EEA)),
-                CryptoAsset("bnb", "Binance Coin", "BNB", 605.10, 0.88, Color(0xFFF3BA2F)),
-                CryptoAsset("sol", "Solana", "SOL", 145.75, 5.01, Color(0xFF9945FF)),
-                CryptoAsset("ada", "Cardano", "ADA", 0.52, -0.45, Color(0xFF0033AD)),
-                CryptoAsset("doge", "Dogecoin", "DOGE", 0.15, 3.10, Color(0xFFC2A633)),
-            )
+            CryptoListScreen()
 
-            CryptoTrackerHomeScreen(assets = sampleAssets)
+//            val sampleAssets = listOf(
+//                CryptoAsset("btc", "Bitcoin", "BTC", 68500.50, 2.34, Color(0xFFF7931A)),
+//                CryptoAsset("eth", "Ethereum", "ETH", 3950.25, -1.12, Color(0xFF627EEA)),
+//                CryptoAsset("bnb", "Binance Coin", "BNB", 605.10, 0.88, Color(0xFFF3BA2F)),
+//                CryptoAsset("sol", "Solana", "SOL", 145.75, 5.01, Color(0xFF9945FF)),
+//                CryptoAsset("ada", "Cardano", "ADA", 0.52, -0.45, Color(0xFF0033AD)),
+//                CryptoAsset("doge", "Dogecoin", "DOGE", 0.15, 3.10, Color(0xFFC2A633)),
+//            )
+//
+//            CryptoTrackerHomeScreen(assets = sampleAssets)
 
         }
     }

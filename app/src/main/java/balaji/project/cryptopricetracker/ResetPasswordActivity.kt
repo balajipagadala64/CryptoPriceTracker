@@ -1,10 +1,5 @@
 package balaji.project.cryptopricetracker
 
-import android.app.Activity
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,25 +31,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.firebase.database.FirebaseDatabase
 
-class ResetPasswordActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            ResetPasswordScreen()
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun ResetPasswordScreenPreview() {
-    ResetPasswordScreen()
+    ResetPasswordScreen(navController = NavHostController(LocalContext.current))
 }
 
 @Composable
-fun ResetPasswordScreen() {
+fun ResetPasswordScreen(navController: NavController) {
 
     var email by remember { mutableStateOf("") }
     var dob by remember { mutableStateOf("") }
@@ -265,13 +254,12 @@ fun ResetPasswordScreen() {
                                     loading = false
                                     successMessage = "Password updated successfully!"
 
-                                    context!!.startActivity(
-                                        Intent(
-                                            context,
-                                            LoginActivity::class.java
-                                        )
-                                    )
-                                    context.finish()
+
+                                    navController.navigate(AppScreens.Login.route) {
+                                        popUpTo(AppScreens.ForgotPassword.route) {
+                                            inclusive = true
+                                        }
+                                    }
                                 }
                                 .addOnFailureListener {
                                     loading = false

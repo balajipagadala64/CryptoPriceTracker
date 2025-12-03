@@ -1,10 +1,6 @@
 package balaji.project.cryptopricetracker
 
-import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,30 +32,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.firebase.database.FirebaseDatabase
 
-class LoginActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            InvestorSignInScreen()
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun InvestorSignInScreenPreview() {
-    InvestorSignInScreen()
+    InvestorSignInScreen(navController = NavHostController(LocalContext.current))
 }
 
 @Composable
-fun InvestorSignInScreen() {
+fun InvestorSignInScreen(navController: NavController) {
 
     var accountEmail by remember { mutableStateOf("") }
     var accountPassword by remember { mutableStateOf("") }
 
     val context = LocalContext.current.findActivity()
+
+    val context1 = LocalContext.current
 
 
     Column(
@@ -147,18 +139,20 @@ fun InvestorSignInScreen() {
             Text(
                 modifier = Modifier
                     .clickable {
-                        when{
+                        when {
 
 
                             accountEmail.isBlank() -> {
                                 Toast.makeText(context, "MailID missing", Toast.LENGTH_SHORT)
                                     .show()
                             }
+
                             accountPassword.isBlank() -> {
                                 Toast.makeText(context, "Password missing", Toast.LENGTH_SHORT)
                                     .show()
 
                             }
+
                             else -> {
 
                                 val database = FirebaseDatabase.getInstance()
@@ -166,24 +160,51 @@ fun InvestorSignInScreen() {
 
                                 val sanitizedEmail = accountEmail.replace(".", ",")
 
-                                databaseReference.child("InsertorAccounts").child(sanitizedEmail).get()
+                                databaseReference.child("InsertorAccounts").child(sanitizedEmail)
+                                    .get()
                                     .addOnSuccessListener { snapshot ->
                                         if (snapshot.exists()) {
-                                            val chefData = snapshot.getValue(InvestorData::class.java)
+                                            val chefData =
+                                                snapshot.getValue(InvestorData::class.java)
                                             chefData?.let {
 
                                                 if (accountPassword == it.password) {
-                                                    Toast.makeText(context, "Login Successfull", Toast.LENGTH_SHORT).show()
-                                                    context!!.startActivity(Intent(context,
-                                                        HomeActivity::class.java))
-                                                    context.finish()
-                                                }
-                                                else{
-                                                    Toast.makeText(context,"Incorrect Credentials",Toast.LENGTH_SHORT).show()
+
+                                                    UserPrefs.markLoginStatus(context1, true)
+                                                    UserPrefs.saveEmail(
+                                                        context1,
+                                                        email = accountEmail
+                                                    )
+                                                    UserPrefs.saveName(context1, it.name)
+
+
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Login Successfull",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+
+                                                    navController.navigate(AppScreens.Home.route) {
+                                                        popUpTo(AppScreens.Login.route) {
+                                                            inclusive = true
+                                                        }
+                                                    }
+
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        "Incorrect Credentials",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
                                                 }
                                             }
                                         } else {
-                                            Toast.makeText(context,"No User Found",Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "No User Found",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }.addOnFailureListener { exception ->
                                         println("Error retrieving data: ${exception.message}")
@@ -222,7 +243,7 @@ fun InvestorSignInScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
-                        context!!.startActivity(Intent(context, ResetPasswordActivity::class.java))
+                        navController.navigate(AppScreens.ForgotPassword.route)
                     },
                 text = "Reset My Password",
                 textAlign = TextAlign.Center,
@@ -238,8 +259,11 @@ fun InvestorSignInScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
-                        context!!.startActivity(Intent(context, RegisterActivity::class.java))
-                        context.finish()
+
+                        navController.navigate(AppScreens.Register.route) {
+                            popUpTo(AppScreens.Login.route) { inclusive = true }
+                        }
+
                     },
                 text = "Take Me To Registration",
                 textAlign = TextAlign.Center,
@@ -258,8 +282,8 @@ fun InvestorSignInScreen() {
 data class InvestorData
     (
     var name: String = "",
-    var dob: String ="",
-    var gender: String ="",
-    var email: String ="",
-    var password: String ="",
+    var dob: String = "",
+    var gender: String = "",
+    var email: String = "",
+    var password: String = "",
 )

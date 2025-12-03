@@ -4,11 +4,7 @@ package balaji.project.cryptopricetracker
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,30 +40,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.google.firebase.database.FirebaseDatabase
 import java.time.LocalDate
 import java.time.Period
 import java.time.format.DateTimeFormatter
 
 
-class RegisterActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            InvestorSignUpScreen()
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun InvestorSignUpScreenPreview() {
-    InvestorSignUpScreen()
+    InvestorSignUpScreen(navController = NavHostController(LocalContext.current))
 }
 
 
 @Composable
-fun InvestorSignUpScreen() {
+fun InvestorSignUpScreen(navController: NavController) {
 
     var accountName by remember { mutableStateOf("") }
     var accountEmail by remember { mutableStateOf("") }
@@ -228,62 +217,72 @@ fun InvestorSignUpScreen() {
             Text(
                 modifier = Modifier
                     .clickable {
-                            if(accountName.isEmpty()) {
-                                Toast.makeText(context, "UserName missing", Toast.LENGTH_SHORT)
-                                    .show()
-                                return@clickable
-                            }
-
-
-                            // Validate DOB empty
-                            if (dob.isEmpty()) {
-                                Toast.makeText(context, "Enter Date of Birth", Toast.LENGTH_SHORT).show()
-                                return@clickable
-                            }
-
-                                // Validate DOB format dd-mm-yyyy
-                                val dobRegex = Regex("^\\d{2}-\\d{2}-\\d{4}$")
-                            if (!dob.matches(dobRegex)) {
-                                Toast.makeText(context, "Invalid DOB format. Use dd-mm-yyyy", Toast.LENGTH_SHORT).show()
-                                return@clickable
-                            }
-
-                                // Validate correct calendar date
-                                try {
-                                val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                                val date = LocalDate.parse(dob, formatter)
-
-                                // Age must be at least 13 (optional)
-                                val age = Period.between(date, LocalDate.now()).years
-                                if (age < 13) {
-                                    Toast.makeText(context, "You must be at least 13 years old", Toast.LENGTH_SHORT).show()
-                                    return@clickable
-                                }
-
-                            } catch (e: Exception) {
-                            Toast.makeText(context, "Enter a valid calendar date", Toast.LENGTH_SHORT).show()
+                        if (accountName.isEmpty()) {
+                            Toast.makeText(context, "UserName missing", Toast.LENGTH_SHORT)
+                                .show()
                             return@clickable
                         }
-                               if(accountEmail.isEmpty())
-                               {
-                                Toast.makeText(context, "EmailId missing", Toast.LENGTH_SHORT)
-                                    .show()
-                                   return@clickable
-                               }
 
-                            if(selectedGender.isEmpty())
-                            {
-                                Toast.makeText(context, "Gender missing", Toast.LENGTH_SHORT)
-                                    .show()
+
+                        // Validate DOB empty
+                        if (dob.isEmpty()) {
+                            Toast.makeText(context, "Enter Date of Birth", Toast.LENGTH_SHORT)
+                                .show()
+                            return@clickable
+                        }
+
+                        // Validate DOB format dd-mm-yyyy
+                        val dobRegex = Regex("^\\d{2}-\\d{2}-\\d{4}$")
+                        if (!dob.matches(dobRegex)) {
+                            Toast.makeText(
+                                context,
+                                "Invalid DOB format. Use dd-mm-yyyy",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@clickable
+                        }
+
+                        // Validate correct calendar date
+                        try {
+                            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                            val date = LocalDate.parse(dob, formatter)
+
+                            // Age must be at least 13 (optional)
+                            val age = Period.between(date, LocalDate.now()).years
+                            if (age < 13) {
+                                Toast.makeText(
+                                    context,
+                                    "You must be at least 13 years old",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 return@clickable
                             }
 
-                            if(accountPassword.isEmpty())
-                            {
-                                Toast.makeText(context, "Password missing", Toast.LENGTH_SHORT)
-                                    .show()
-                                return@clickable
-                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                context,
+                                "Enter a valid calendar date",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@clickable
+                        }
+                        if (accountEmail.isEmpty()) {
+                            Toast.makeText(context, "EmailId missing", Toast.LENGTH_SHORT)
+                                .show()
+                            return@clickable
+                        }
+
+                        if (selectedGender.isEmpty()) {
+                            Toast.makeText(context, "Gender missing", Toast.LENGTH_SHORT)
+                                .show()
+                            return@clickable
+                        }
+
+                        if (accountPassword.isEmpty()) {
+                            Toast.makeText(context, "Password missing", Toast.LENGTH_SHORT)
+                                .show()
+                            return@clickable
+                        }
 
 
                         val userData = InvestorData(
@@ -300,15 +299,19 @@ fun InvestorSignUpScreen() {
                         ref.child(userData.email.replace(".", ",")).setValue(userData)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
-                                    Toast.makeText(context, "Registration Successful", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Registration Successful",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
-                                    context!!.startActivity(
-                                        Intent(
-                                            context,
-                                            LoginActivity::class.java
-                                        )
-                                    )
-                                    (context).finish()
+
+
+                                    navController.navigate(AppScreens.Login.route) {
+                                        popUpTo(AppScreens.Register.route) {
+                                            inclusive = true
+                                        }
+                                    }
                                 } else {
                                     Toast.makeText(
                                         context,
@@ -324,7 +327,6 @@ fun InvestorSignUpScreen() {
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-
 
 
                     }
@@ -358,8 +360,13 @@ fun InvestorSignUpScreen() {
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp)
                     .clickable {
-                        context!!.startActivity(Intent(context, LoginActivity::class.java))
-                        context.finish()
+
+                        navController.navigate(AppScreens.Login.route) {
+                            popUpTo(AppScreens.Register.route) {
+                                inclusive = true
+                            }
+                        }
+
                     },
                 text = "Take Me To Login",
                 textAlign = TextAlign.Center,

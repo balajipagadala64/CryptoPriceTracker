@@ -1,12 +1,12 @@
 package balaji.project.cryptopricetracker
 
 
-import android.app.Activity
-import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,23 +23,23 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import balaji.project.cryptopricetracker.screens.CryptoListScreen
 import balaji.project.cryptopricetracker.ui.theme.CryptoPriceTrackerTheme
 import kotlinx.coroutines.delay
-import kotlin.jvm.java
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,36 +47,77 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             CryptoPriceTrackerTheme {
-                LoadingScreenCheck(::isUserLoggedIn)
+                MyAppNavGraph()
             }
         }
     }
 
-    private fun isUserLoggedIn(value: Int) {
-
-        when (value) {
-            2 -> {
-                gotoSignInActivity(this)
-            }
-
-        }
-    }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun LoadingScreenCheck(isUserLoggedIn: (value: Int) -> Unit) {
-    var splashValue by remember { mutableStateOf(true) }
+fun MyAppNavGraph() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = AppScreens.Splash.route
+    ) {
+        composable(AppScreens.Splash.route) {
+            LoadingScreenCheck(navController = navController)
+        }
+
+        composable(AppScreens.Login.route) {
+            InvestorSignInScreen(navController = navController)
+        }
+
+        composable(AppScreens.Register.route) {
+            InvestorSignUpScreen(navController = navController)
+        }
+
+        composable(AppScreens.ForgotPassword.route) {
+//            ResetPasswordScreen(navController = navController)
+        }
+
+        composable(AppScreens.Home.route) {
+            ContainerScreen()
+        }
+
+//        composable(AppScreens.CryptoListScreen.route) {
+//            ContainerScreen()
+//        }
+
+
+    }
+
+}
+
+
+@Composable
+fun LoadingScreenCheck(navController: NavController) {
+
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         delay(3000)
-        splashValue = false
+
+        if (UserPrefs.checkLoginStatus(context)) {
+            navController.navigate(AppScreens.Home.route) {
+                popUpTo(AppScreens.Splash.route) {
+                    inclusive = true
+                }
+            }
+        } else {
+            navController.navigate(AppScreens.Login.route) {
+                popUpTo(AppScreens.Splash.route) {
+                    inclusive = true
+                }
+            }
+        }
+
     }
 
-    if (splashValue) {
-        CryptoPriceScreen()
-    } else {
-        isUserLoggedIn.invoke(2)
-    }
+    CryptoPriceScreen()
 }
 
 
@@ -94,7 +135,7 @@ fun CryptoPriceScreen() {
         Spacer(modifier = Modifier.height(24.dp))
 
         Image(
-            painter = painterResource(id = R.drawable.icon_cryptocurrency), // Replace with your actual SVG drawable
+            painter = painterResource(id = R.drawable.icon_cryptocurrency),
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
@@ -164,9 +205,4 @@ fun CryptoPriceScreen() {
 @Composable
 fun LoadingScreenPreview() {
     CryptoPriceScreen()
-}
-
-fun gotoSignInActivity(context: Activity) {
-    context.startActivity(Intent(context, LoginActivity::class.java))
-    context.finish()
 }

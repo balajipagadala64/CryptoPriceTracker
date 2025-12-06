@@ -2,6 +2,7 @@ package balaji.project.cryptopricetracker.screens
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,11 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import balaji.project.cryptopricetracker.InvestorSignInScreen
 import coil.compose.AsyncImage
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface CoinGeckoApi {
@@ -57,7 +58,26 @@ interface CoinGeckoApi {
         @Query("page") page: Int = 1,
         @Query("sparkline") sparkline: Boolean = false
     ): List<CryptoItem>
+
+    @GET("coins/{id}")
+    suspend fun getCoinDetails(
+        @Path("id") id: String,
+        @Query("localization") localization: Boolean = false,
+        @Query("tickers") tickers: Boolean = false,
+        @Query("market_data") marketData: Boolean = true,
+        @Query("community_data") community: Boolean = false,
+        @Query("developer_data") developer: Boolean = false,
+        @Query("sparkline") sparkline: Boolean = true
+    ): CoinDetailResponse
+
+    @GET("coins/{id}/market_chart")
+    suspend fun getMarketChart(
+        @Path("id") id: String,
+        @Query("vs_currency") currency: String = "usd",
+        @Query("days") days: Int = 7
+    ): MarketChartResponse
 }
+
 
 data class CryptoItem(
     val id: String,
@@ -173,7 +193,9 @@ fun CryptoListScreen(navController: NavController) {
                             .padding(10.dp)
                     ) {
                         items(filteredList) { coin ->
-                            CryptoRow(coin)
+                            CryptoRow(coin){ clickedId ->
+                                navController.navigate("details/$clickedId")
+                            }
                         }
                     }
                 }
@@ -184,11 +206,12 @@ fun CryptoListScreen(navController: NavController) {
 
 
 @Composable
-fun CryptoRow(coin: CryptoItem) {
+fun CryptoRow(coin: CryptoItem,onClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 6.dp)
+            .clickable { onClick(coin.id) },
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(

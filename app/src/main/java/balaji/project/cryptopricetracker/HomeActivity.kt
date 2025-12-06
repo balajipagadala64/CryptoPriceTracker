@@ -36,6 +36,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import balaji.project.cryptopricetracker.screens.CryptoDetailsScreen
 import balaji.project.cryptopricetracker.screens.CryptoListScreen
 
 
@@ -85,6 +86,14 @@ fun NavigationGraph(navController: NavHostController) {
         composable(BottomNavItem.CryptoList.route) { CryptoListScreen(navController) }
         composable(BottomNavItem.Favourites.route) { FavouritesScreen() }
         composable(BottomNavItem.Profile.route) { Profile() }
+
+        composable(
+            route = "details/{coinId}"
+        ) { backStackEntry ->
+            val coinId = backStackEntry.arguments?.getString("coinId")!!
+            CryptoDetailsScreen(coinId)
+        }
+
     }
 }
 

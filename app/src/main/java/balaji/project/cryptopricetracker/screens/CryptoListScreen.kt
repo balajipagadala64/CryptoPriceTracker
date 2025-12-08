@@ -35,13 +35,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import balaji.project.cryptopricetracker.App
+import balaji.project.cryptopricetracker.R
 import coil.compose.AsyncImage
+import okhttp3.Cache
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
@@ -91,14 +96,29 @@ data class CryptoItem(
 
 object RetrofitHelper {
 
+    private val cacheSize = (5 * 1024 * 1024) // 5 MB
+    private val cache = Cache(App.context.cacheDir, cacheSize.toLong())
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .cache(cache)
+        .addInterceptor { chain ->
+            val response = chain.proceed(chain.request())
+            response.newBuilder()
+                .header("Cache-Control", "public, max-age=30") // cache for 30 seconds
+                .build()
+        }
+        .build()
+
     val api: CoinGeckoApi by lazy {
         Retrofit.Builder()
             .baseUrl("https://api.coingecko.com/api/v3/")
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(CoinGeckoApi::class.java)
     }
 }
+
 
 
 @Preview(showBackground = true)
@@ -138,6 +158,8 @@ fun CryptoListScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(10.dp)
             ) {
+
+
                 OutlinedTextField(
                     value = searchText,
                     onValueChange = {

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -36,8 +37,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import balaji.project.cryptopricetracker.screens.CryptoDetailsScreen
+import balaji.project.cryptopricetracker.screens.CryptoDetailsScreenEnhanced
 import balaji.project.cryptopricetracker.screens.CryptoListScreen
+import balaji.project.cryptopricetracker.screens.CryptoNewsScreen
+import balaji.project.cryptopricetracker.screens.FavoriteDetailsScreen
 
 
 @Composable
@@ -55,20 +58,14 @@ fun ContainerScreen() {
 
 sealed class BottomNavItem(val route: String, val title: String, val icon: ImageVector) {
     object CryptoList : BottomNavItem("cryptolist", "Crypto List", Icons.Filled.CurrencyBitcoin)
-    object Favourites :
-        BottomNavItem("favourites", "Favourites", Icons.Filled.FavoriteBorder)
+    object Favourites : BottomNavItem("favourites", "Favourites", Icons.Filled.FavoriteBorder)
+    object News : BottomNavItem("news", "News", Icons.Filled.Newspaper)
 
     object Profile :
         BottomNavItem("profile", "Update Profile", Icons.Filled.AccountCircle)
 }
 
 
-@Composable
-fun FavouritesScreen() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Favourites")
-    }
-}
 
 @Composable
 fun Profile() {
@@ -84,15 +81,22 @@ fun NavigationGraph(navController: NavHostController) {
         startDestination = BottomNavItem.CryptoList.route
     ) {
         composable(BottomNavItem.CryptoList.route) { CryptoListScreen(navController) }
-        composable(BottomNavItem.Favourites.route) { FavouritesScreen() }
+        composable(BottomNavItem.Favourites.route) { FavoriteDetailsScreen(){
+            navController.navigate("details/$it")
+        } }
         composable(BottomNavItem.Profile.route) { Profile() }
+        composable(BottomNavItem.News.route) { CryptoNewsScreen() }
 
         composable(
             route = "details/{coinId}"
         ) { backStackEntry ->
             val coinId = backStackEntry.arguments?.getString("coinId")!!
-            CryptoDetailsScreen(coinId)
+            CryptoDetailsScreenEnhanced(coinId, onBack = {
+                navController.popBackStack()
+            })
         }
+
+
 
     }
 }
@@ -103,6 +107,7 @@ fun CustomBottomBar(navController: NavHostController) {
     val items = listOf(
         BottomNavItem.CryptoList,
         BottomNavItem.Favourites,
+        BottomNavItem.News,
         BottomNavItem.Profile
     )
 

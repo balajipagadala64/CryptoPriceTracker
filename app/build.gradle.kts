@@ -1,5 +1,3 @@
-import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -10,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "balaji.project.cryptopricetracker"
+    namespace = "balaji.s3523978project.cryptopricetracker"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "balaji.project.cryptopricetracker"
+        applicationId = "balaji.s3523978project.cryptopricetracker"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

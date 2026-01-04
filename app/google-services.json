@@ -1,15 +1,16 @@
 {
   "project_info": {
     "project_number": "999469676262",
+    "firebase_url": "https://cryptopricetracker-d551c-default-rtdb.firebaseio.com",
     "project_id": "cryptopricetracker-d551c",
     "storage_bucket": "cryptopricetracker-d551c.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:999469676262:android:6f62b1a513b399ee4d6d27",
+        "mobilesdk_app_id": "1:999469676262:android:17a414e427477aa04d6d27",
         "android_client_info": {
-          "package_name": "balaji.project.cryptopricetracker"
+          "package_name": "balaji.s3523978project.cryptopricetracker"
         }
       },
       "oauth_client": [],
